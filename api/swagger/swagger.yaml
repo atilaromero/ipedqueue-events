@@ -1,12 +1,12 @@
 swagger: "2.0"
 info:
-  version: "0.0.1"
+  version: "1.0.0"
   title: iped-queue-events
 # during dev, should point to your local machine
 #host: localhost:8080
-# basePath prefixes all resource paths 
+# basePath prefixes all resource paths
 basePath: /v1
-# 
+#
 schemes:
   # tip: remove http to make production-grade
   - http
@@ -34,7 +34,7 @@ paths:
           schema:
             $ref: "#/definitions/EventList"
         "404":
-          description: Evidence not found 
+          description: Evidence not found
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
@@ -64,7 +64,7 @@ paths:
         "204":
           description: Success
         "404":
-          description: Evidence not found 
+          description: Evidence not found
           schema:
             $ref: "#/definitions/ErrorResponse"
         default:
