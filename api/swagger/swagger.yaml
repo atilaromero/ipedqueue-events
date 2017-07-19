@@ -1,0 +1,100 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: iped-queue-events
+# during dev, should point to your local machine
+#host: localhost:8080
+# basePath prefixes all resource paths 
+basePath: /v1
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /evidence/{id}/events:
+    x-swagger-router-controller: events
+    get:
+      description: Returns evidence events
+      parameters:
+        - name: id
+          in: path
+          description: Evidence id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/EventList"
+        "404":
+          description: Evidence not found 
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      description: Adds an event
+      parameters:
+        - name: id
+          in: path
+          description: Evidence id
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - event
+            properties:
+              event:
+                type: string
+              details:
+                type: object
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Evidence not found 
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  EventList:
+    type: array
+    items:
+      $ref: "#/definitions/Event"
+  Event:
+    required:
+      - event
+    properties:
+      evidence:
+        type: string
+      event:
+        type: string
+      details:
+        type: object
+      date:
+        type: string
+        format: date-time
+  ErrorResponse:
+    required:
+      - error
+    properties:
+      error:
+        type: string
