@@ -6,8 +6,12 @@ const Event = mongoose.model('Event')
 
 module.exports.get = function get (req, res) {
   try {
-    const id = req.swagger.params.id.value
-    Event.find({evidence: id}, null, {sort: {date: 1}}, (err, docs) => {
+    const id = req.swagger.params.id && req.swagger.params.id.value
+    let filter = {}
+    if (id) {
+      filter = {evidence: id}
+    }
+    Event.find(filter, null, {sort: {date: 1}}, (err, docs) => {
       if (err) {
         console.log(err)
         return res.status(500).json({error: err.stack})

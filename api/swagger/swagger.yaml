@@ -18,6 +18,19 @@ consumes:
 produces:
   - application/json
 paths:
+  /events:
+    x-swagger-router-controller: events
+    get:
+      description: Returns all events
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/EventList"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
   /evidence/{id}/events:
     x-swagger-router-controller: events
     get:
