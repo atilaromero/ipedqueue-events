@@ -9,6 +9,7 @@ module.exports.get = function get (req, res) {
       'Content-type': 'text/event-stream charset=utf-8',
       'Transfer-Encoding': 'identity',
       'Cache-Control': 'no-cache',
+      'X-Accel-Buffering': 'no',
       'Connection': 'keep-alive'
     })
     res.write('\n')

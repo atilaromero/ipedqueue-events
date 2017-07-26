@@ -1,9 +1,9 @@
 swagger: "2.0"
 info:
-  version: "1.0.2"
+  version: "1.0.3"
   title: iped-queue-events
 # during dev, should point to your local machine
-#host: localhost:8080
+host: localhost:8080
 # basePath prefixes all resource paths
 basePath: /v1
 #
