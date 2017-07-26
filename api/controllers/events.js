@@ -3,6 +3,7 @@
 require('../../models')
 const mongoose = require('mongoose')
 const Event = mongoose.model('Event')
+const eventSource = require('../../lib/event-source')
 
 module.exports.get = function get (req, res) {
   try {
@@ -40,6 +41,7 @@ module.exports.post = function post (req, res) {
         console.log(err)
         return res.status(500).json({error: err.stack})
       }
+      eventSource.emit('message', ev)
       return res.status(204).end()
     })
   } catch (err) {

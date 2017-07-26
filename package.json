@@ -1,6 +1,6 @@
 {
   "name": "iped-queue-events",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
   "description": "Events for iped-queue",
   "keywords": [],
@@ -9,6 +9,7 @@
   "main": "app.js",
   "dependencies": {
     "config": "^1.26.1",
+    "debug": "^2.6.8",
     "express": "^4.12.3",
     "mongoose": "^4.11.3",
     "swagger-express-mw": "^0.1.0"
