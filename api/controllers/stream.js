@@ -1,6 +1,6 @@
 'use strict'
 
-const eventSource = require('../../lib/event-source')
+const emitter = require('../../lib/emitter')
 
 module.exports.get = function get (req, res) {
   try {
@@ -12,7 +12,7 @@ module.exports.get = function get (req, res) {
       'Connection': 'keep-alive'
     })
     res.write('\n')
-    eventSource.on('message', (message) => {
+    emitter.on('message', (message) => {
       setImmediate(function onMessage () {
         res.write('data: ' + JSON.stringify(message) + '\n\n')
         res.flush()
