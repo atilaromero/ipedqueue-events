@@ -1,11 +1,11 @@
 swagger: "2.0"
 info:
-  version: "1.0.3"
+  version: "2.0.0"
   title: iped-queue-events
 # during dev, should point to your local machine
 # host: localhost:8080
 # basePath prefixes all resource paths
-basePath: /v1
+basePath: /v2
 #
 schemes:
   # tip: remove http to make production-grade
@@ -17,38 +17,32 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+  - text/event-stream
 paths:
-  /stream:
-    x-swagger-router-controller: stream
-    get:
-      produces:
-        - text/event-stream
-      responses:
-        default:
-          description: stream
   /events:
     x-swagger-router-controller: events
     get:
-      description: Returns all events
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/EventList"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /evidence/{id}/events:
-    x-swagger-router-controller: events
-    get:
-      description: Returns evidence events
+      description: List events by channel or evidence
       parameters:
-        - name: id
-          in: path
-          description: Evidence id
-          required: true
+        - name: channel
+          in: query
+          required: false
           type: string
+        - name: evidence
+          description: Evidence id
+          in: query
+          required: false
+          type: string
+        - name: since
+          description: Since date-time
+          in: query
+          required: false
+          type: string
+          format: date-time
+        - name: stream
+          in: query
+          required: false
+          type: boolean
       responses:
         "200":
           description: Success
@@ -65,22 +59,11 @@ paths:
     post:
       description: Adds an event
       parameters:
-        - name: id
-          in: path
-          description: Evidence id
-          required: true
-          type: string
         - name: body
           in: body
           required: true
           schema:
-            required:
-              - event
-            properties:
-              event:
-                type: string
-              details:
-                type: object
+            $ref: "#/definitions/Event"
       responses:
         "204":
           description: Success
@@ -102,14 +85,15 @@ definitions:
       $ref: "#/definitions/Event"
   Event:
     required:
-      - event
+      - channel
+      - type
     properties:
+      channel:
+        type: string
+      type:
+        type: string
       evidence:
         type: string
-      event:
-        type: string
-      details:
-        type: object
       date:
         type: string
         format: date-time

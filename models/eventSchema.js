@@ -3,10 +3,10 @@
 const mongoose = require('mongoose')
 
 module.exports = new mongoose.Schema({
+  channel: String,
+  type: String,
   evidence: String,
-  event: String,
-  details: Object,
   date: Date
-})
+}, {strict: false})
 
 module.exports.set('collection', 'event')
