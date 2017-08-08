@@ -19,14 +19,14 @@ function sendstream (res, objs, channel, evidence) {
   res.flush()
   objs.forEach(x => {
     setImmediate(function onMessage () {
-      res.write('event: ' + channel + '\n')
+      res.write('event: ' + x.channel + '\n')
       res.write('data: ' + JSON.stringify(x) + '\n\n')
     })
   })
   emitter.on(channel, (message) => {
     if ((!evidence) || (evidence === message.evidence)) {
       setImmediate(function onMessage () {
-        res.write('event: ' + channel + '\n')
+        res.write('event: ' + message.channel + '\n')
         res.write('data: ' + JSON.stringify(message) + '\n\n')
       })
     }
