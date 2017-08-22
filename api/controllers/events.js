@@ -71,6 +71,7 @@ module.exports.post = function post (req, res) {
         return res.status(500).json({error: err.stack})
       }
       emitter.emit(body.channel, ev)
+      emitter.emit(undefined, ev) // all channels
       return res.status(204).end()
     })
   } catch (err) {
