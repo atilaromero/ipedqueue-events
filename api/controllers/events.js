@@ -7,6 +7,14 @@ const EventEmitter = require('events')
 const emitter = new EventEmitter()
 
 function sendstream (res, objs, channel, evidence) {
+  function chunk (message) {
+    if ((!evidence) || (evidence === message.evidence)) {
+      setImmediate(function onMessage () {
+        res.write('event: ' + message.channel + '\n')
+        res.write('data: ' + JSON.stringify(message) + '\n\n')
+      })
+    }
+  }
   res.status(200)
   res.set({
     'Content-type': 'text/event-stream charset=utf-8',
@@ -17,20 +25,8 @@ function sendstream (res, objs, channel, evidence) {
   })
   res.write('\n')
   res.flush()
-  objs.forEach(x => {
-    setImmediate(function onMessage () {
-      res.write('event: ' + x.channel + '\n')
-      res.write('data: ' + JSON.stringify(x) + '\n\n')
-    })
-  })
-  emitter.on(channel, (message) => {
-    if ((!evidence) || (evidence === message.evidence)) {
-      setImmediate(function onMessage () {
-        res.write('event: ' + message.channel + '\n')
-        res.write('data: ' + JSON.stringify(message) + '\n\n')
-      })
-    }
-  })
+  objs.forEach(chunk)
+  emitter.on(channel, chunk)
 }
 
 module.exports.get = function get (req, res) {
