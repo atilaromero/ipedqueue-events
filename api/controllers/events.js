@@ -16,7 +16,7 @@ function sendStreamHeader (res) {
     'Connection': 'keep-alive'
   })
   res.write('\n')
-  res.flush()
+  res.flushHeaders()
 }
 
 function sendstream (res, channel, evidence) {
@@ -30,6 +30,11 @@ function sendstream (res, channel, evidence) {
     }
   }
   emitter.on(channel, chunk)
+  let cancel = setInterval(function () {
+    res.write('\n', 'utf8', err => {
+      if (err) { cancel() }
+    })
+  }, 5000)
 }
 
 module.exports.get = function get (req, res) {
