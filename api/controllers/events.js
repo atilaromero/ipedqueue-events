@@ -6,15 +6,7 @@ const Event = mongoose.model('Event')
 const EventEmitter = require('events')
 const emitter = new EventEmitter()
 
-function sendstream (res, objs, channel, evidence) {
-  function chunk (message) {
-    if ((!evidence) || (evidence === message.evidence)) {
-      setImmediate(function onMessage () {
-        res.write('event: ' + message.channel + '\n')
-        res.write('data: ' + JSON.stringify(message) + '\n\n')
-      })
-    }
-  }
+function sendStreamHeader (res) {
   res.status(200)
   res.set({
     'Content-type': 'text/event-stream charset=utf-8',
@@ -25,7 +17,18 @@ function sendstream (res, objs, channel, evidence) {
   })
   res.write('\n')
   res.flush()
-  objs.forEach(chunk)
+}
+
+function sendstream (res, channel, evidence) {
+  sendStreamHeader(res)
+  function chunk (message) {
+    if ((!evidence) || (evidence === message.evidence)) {
+      setImmediate(function onMessage () {
+        res.write('event: ' + message.channel + '\n')
+        res.write('data: ' + JSON.stringify(message) + '\n\n')
+      })
+    }
+  }
   emitter.on(channel, chunk)
 }
 
@@ -36,6 +39,15 @@ module.exports.get = function get (req, res) {
     const since = req.swagger.params.since && req.swagger.params.since.value
     const stream = req.swagger.params.stream && req.swagger.params.stream.value
 
+    if (since && stream) {
+      console.error({error: "can't mix since and stream"})
+      return res.status(400).json({error: "can't mix since and stream"})
+    }
+
+    if (stream) {
+      return sendstream(res, channel, evidence)
+    }
+
     let filter = {}
     if (channel) { Object.assign(filter, {channel}) }
     if (evidence) { Object.assign(filter, {evidence}) }
@@ -43,16 +55,13 @@ module.exports.get = function get (req, res) {
 
     Event.find(filter, null, {sort: {date: 1}}, (err, docs) => {
       if (err) {
-        console.log(err)
+        console.error(err.message)
         return res.status(500).json({error: err.stack})
       }
-      if (stream) {
-        sendstream(res, docs, channel, evidence)
-      } else {
-        return res.json(docs)
-      }
+      return res.json(docs)
     })
   } catch (err) {
+    console.error(err)
     return res.status(500).json({error: err.stack})
   }
 }
@@ -67,7 +76,7 @@ module.exports.post = function post (req, res) {
     let ev = new Event(obj)
     ev.save((err) => {
       if (err) {
-        console.log(err)
+        console.error(err)
         return res.status(500).json({error: err.stack})
       }
       emitter.emit(body.channel, ev)
@@ -75,7 +84,7 @@ module.exports.post = function post (req, res) {
       return res.status(204).end()
     })
   } catch (err) {
-    console.log(err)
+    console.error(err)
     return res.status(500).json({error: err.stack})
   }
 }
